@@ -1,0 +1,23 @@
+{
+  "name": "ca_javascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rls-legacy/CA_JavaScript.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rls-legacy/CA_JavaScript/issues"
+  },
+  "homepage": "https://github.com/rls-legacy/CA_JavaScript#readme",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "superagent": "^4.1.0"
+  }
+}
