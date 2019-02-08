@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 
-module.exports.run = async (client, message, args, basic, admin, dev) => {
+module.exports.run = async (client, message, args) => {
   if(message.author.id !== '180639594017062912') return;
   const code = args.join(' ');
   var evaled = eval(code);
