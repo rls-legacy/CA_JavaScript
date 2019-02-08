@@ -1,9 +1,8 @@
 const Discord = require("discord.js");
-const owner = "180639594017062912"
-module.exports.run = async (bot, message, args) => {
-  const logger = bot.channels.get('477841252763697154');
-  if(message.author.id !== owner) return;
-  const code = args.split(' ').join(',');
+
+module.exports.run = async (client, message, args, basic, admin, dev) => {
+  if(message.author.id !== '180639594017062912') return;
+  const code = args.join(' ');
   var evaled = eval(code);
 
   try {
@@ -11,21 +10,20 @@ module.exports.run = async (bot, message, args) => {
     var success = new Discord.RichEmbed()
     .setTitle("SUCCESS!")
     .setColor("#00ff00")
-    .addField("input", "```" + code + "```")
-    .addField("output", "```"+evaled+"```", {code:"xl"})
+    .addField("input", "```js\n" + code + "```")
+    .addField("output", "```js\n"+evaled+"```")
     message.channel.send(success);
-    logger.send(success)
   }catch(e) {
     console.error("encountered an error while evaluating");
     var error = new Discord.RichEmbed()
     .setTitle("ERROR!")
-    .setColor("#00ff00")
-    .addField("input", "```" + code + "```")
-    .addField("output", "```ERROR```" + `${e}`, {code:"xl"})
+    .setColor("#ff0000")
+    .addField("input", "```js\n" + code + "```")
+    .addField("output", "```js\n"+e+"```")
     message.channel.send(error)
-    logger.send(error)
   };
 }
 module.exports.help = {
-  name:"eval"
+  name:"eval",
+  description:"evaluate code on the go"
 }
