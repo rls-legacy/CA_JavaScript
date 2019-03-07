@@ -7,5 +7,5 @@ Insert your Firebase Configuration Settings.
 
 - add process.env.SECRET = "Discord Token"
 - add process.env.PREFIX = "captn"
-- add process.env.OWNER = []
+- add process.env.OWNER = [owner_ids]
 - add process.env.STRINGSECRET = "random generated code"
