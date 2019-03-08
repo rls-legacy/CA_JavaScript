@@ -1,1 +1,3 @@
 settings/database/serviceAccountKeys.json
+node_modules/
+.idea/
