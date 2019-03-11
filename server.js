@@ -14,7 +14,6 @@ function RunCommandFile(file, object, intent) {
 
 }
 
-
 //Client: login
 client.login(process.env.SECRET);
 
@@ -57,7 +56,11 @@ client.on("guildDelete", guild => {
 //Client: received a message
 client.on("message", message => {
 
-	//Export: to @/router/index.js
-	RunCommandFile('./router/index.js', message, "message")
+	if (message.content.startsWith("captn ping")) {
+		RunCommandFile('./store/modules/system/ping.js', message)
+	} else {
+		//Export: to @/router/index.js
+		RunCommandFile('./router/index.js', message, "message")
+	}
 
 });

@@ -20,7 +20,7 @@ exports.description = () => {
 //Export: from @/store/CommandHandler/index.js
 exports.run = async (client, object, array, override) => {
 
-	const message = await object.channel.send({embed: {title: "Ping?"}});
+	const message = await object.channel.send("Ping?");
 
 	let embed = {
 		title: "Pong!",

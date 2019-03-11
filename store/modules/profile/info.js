@@ -18,7 +18,7 @@ exports.description = () => {
 	return {
 		name: "info",
 		description: "Returns current speed of the RLS-Legacy",
-		permissions: ["SEND_MESSAGES"]
+		permissions: ["SEND_MESSAGES", "ADMINISTRATOR"]
 	}
 };
 
@@ -75,10 +75,21 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Status",
-						value: status_icon + status_i,
+						name: "Status".padEnd(20, `~`).replace(/~/g, "⠀"),
+						value: status_icon + `\`\`${status_i}\`\``,
 						inline: true
 					}
+				]
+			}
+		},
+		bot: function(member) {
+			return {
+				fields: [
+					{
+						name: "Bot?",
+						value: `\`\`${member.user.bot}\`\``,
+						inline: true
+					},
 				]
 			}
 		},
@@ -102,8 +113,8 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: main_status,
-						value: sub_status,
+						name: main_status.padEnd(22, `~`).replace(/~/g, "⠀"),
+						value: `\`\`${sub_status}\`\``,
 						inline: true
 					},
 				]
@@ -119,8 +130,8 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Nickname",
-						value: main_nickname,
+						name: "Nickname".padEnd(20, `~`).replace(/~/g, "⠀"),
+						value: `\`\`${main_nickname}\`\``,
 						inline: true
 					}
 				]
@@ -130,8 +141,8 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "ID",
-						value: member.id,
+						name: "ID".padEnd(20, `~`).replace(/~/g, "⠀"),
+						value: `\`\`${member.id}\`\``,
 						inline: true
 					}
 				]
@@ -142,7 +153,7 @@ exports.run = async (client, object, base, override) => {
 				fields: [
 					{
 						name: `Hierarchy`,
-						value: member.highestRole.calculatedPosition,
+						value: `\`\`${member.highestRole.calculatedPosition}\`\``,
 						inline: true
 					}
 				]
@@ -152,8 +163,8 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: `Roles [${member.roles.array().length}]`,
-						value: member.roles.map(r => r).sort((a, b) => a['position'] - b['position']).reverse().join(' | ')
+						name: `Roles (\`\`${member.roles.array().length}\`\`)`,
+						value: member.roles.map(r => r).sort((a, b) => a['position'] - b['position']).reverse().join(' \`\`|\`\` ')
 					}
 				]
 			}
@@ -171,7 +182,7 @@ exports.run = async (client, object, base, override) => {
 				fields: [
 					{
 						name: `Joined`,
-						value: moment(member.joinedTimestamp).format("DD MMM YYYY HH:mm")
+						value: `\`\`${moment(member.joinedTimestamp).format("DD MMM YYYY HH:mm")}\`\``
 					}
 				]
 			}
@@ -181,14 +192,14 @@ exports.run = async (client, object, base, override) => {
 				fields: [
 					{
 						name: `Created`,
-						value: moment(member.user.createdTimestamp).format("DD MMM YYYY HH:mm")
+						value: `\`\`${moment(member.user.createdTimestamp).format("DD MMM YYYY HH:mm")}\`\``
 					}
 				]
 			}
 		},
 		info: function (member) {
 			let override_embed = {
-				description: `Created: ${moment(member.user.createdTimestamp).fromNow()}\nJoined: ${moment(member.joinedTimestamp).fromNow()}`,
+				description: `\`\`Created: ${moment(member.user.createdTimestamp).fromNow()}\`\`\n\`\`Joined: ${moment(member.joinedTimestamp).fromNow()}\`\``,
 				timestamp: null
 			};
 
@@ -251,14 +262,16 @@ exports.run = async (client, object, base, override) => {
 		let user = null;
 
 		if (array[x]) {
-			array[x] = array[x].toLowerCase();
 			if (object.guild.members.get(array[x])) {
+				array[x] = array[x].toLowerCase();
 				user = object.guild.members.get(array[x]).user;
 			} else if (object.guild.members.find(value => value.displayName.toLowerCase().startsWith(array[x]))) {
+				array[x] = array[x].toLowerCase();
 				user = object.guild.members.find(value => value.displayName.toLowerCase().startsWith(array[x])).user
-			} else if (object.guild.members.find(value => value.id.toLowerCase().startsWith(array[x]))) {
-				user = object.guild.members.find(value => value.id.toLowerCase().startsWith(array[x])).user
+			} else if (object.guild.members.find(value => value.id.startsWith(array[x]))) {
+				user = object.guild.members.find(value => value.id.startsWith(array[x])).user
 			} else if (client.users.find(value => value.username.toLowerCase().startsWith(array[x]))) {
+				array[x] = array[x].toLowerCase();
 				user = client.users.find(value => value.username.toLowerCase().startsWith(array[x]))
 			} else if (object.mentions.members.array()[b]) {
 				user = object.mentions.users.array()[b];

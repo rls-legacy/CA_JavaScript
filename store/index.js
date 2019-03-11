@@ -3,9 +3,9 @@ let commandFile;
 
 /*Local Functions*/
 //Run File
-function RunCommandFile(file, client, object, database) {
+function RunCommandFile(file, client, object, database, real_db) {
 	commandFile = require(file);
-	commandFile.run(client, object, database);
+	commandFile.run(client, object, database, real_db);
 }
 
 //Get Commands
@@ -28,7 +28,7 @@ exports.run = (client, object, intent, database) => {
 			let path = database.collection('configuration').doc('commands');
 			let commands = GetCommands(path);
 			commands.then(function (doc) {
-				RunCommandFile(`./${intent['folder']}/${intent['file']}.js`, client, object, doc);
+				RunCommandFile(`./${intent['folder']}/${intent['file']}.js`, client, object, doc, database);
 			});
 			break;
 		default:

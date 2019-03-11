@@ -6,9 +6,9 @@ let commandFile;
 
 /*Local Functions*/
 //Run File
-function RunCommandFile(file, client, object, intent, override) {
+function RunCommandFile(file, client, object, intent, override, real_db) {
 	commandFile = require(file);
-	commandFile.run(client, object, intent, override);
+	commandFile.run(client, object, intent, override, real_db);
 }
 
 //Description File
@@ -24,7 +24,7 @@ function ReturnCommandFile(file, object, joiner) {
 }
 
 //Export: from @/router/index.js
-exports.run = (client, object, commandDoc) => {
+exports.run = (client, object, commandDoc, database) => {
 
 	let m_res = ReturnCommandFile('./parser/intent.js', object);
 
@@ -160,7 +160,7 @@ exports.run = (client, object, commandDoc) => {
 					}
 
 					let arguments = ReturnCommandFile('./parser/arguments.js', arr_go, joiner);
-					RunCommandFile(`${arr_m[0].toString()}`, client, object, arguments, override)
+					RunCommandFile(`${arr_m[0].toString()}`, client, object, arguments, override, database)
 				} else {
 					let embed = {
 						color: 16711744,

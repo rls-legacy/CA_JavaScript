@@ -40,7 +40,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Name",
+						name: "Name".padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${member.name}\`\``,
 						inline: true
 					}
@@ -75,7 +75,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: verific_name,
+						name: verific_name.padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${verific_level}\`\``,
 						inline: true
 					}
@@ -89,7 +89,7 @@ exports.run = async (client, object, base, override) => {
 				},
 				fields: [
 					{
-						name: "Server Owner",
+						name: "Server Owner".padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${member.owner.displayName}\`\``,
 						inline: true
 					}
@@ -101,7 +101,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Server Administrators",
+						name: ("Server Administrators").padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\` • ${perm_arr.map((value) => value.displayName).reverse().join('\`\`\n\`\` • ')}\`\``,
 						inline: true
 					}
@@ -131,7 +131,7 @@ exports.run = async (client, object, base, override) => {
 				},
 				fields: [
 					{
-						name: "Presences " + `(\`\`${all}\`\`)`,
+						name: ("Presences " + `(\`\`${all}\`\`)`).padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `${online_icon + `\`\`${online}\`\``} ${idle_icon + `\`\`${idle}\`\``} ${dnd_icon + `\`\`${dnd}\`\``} ${streaming_icon + `\`\`${streaming}\`\``} ${offline_icon + `\`\`${offline}\`\``}`,
 						inline: true
 					}
@@ -148,7 +148,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Partner",
+						name: "Partner".padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${is_partner}\`\``,
 						inline: true
 					}
@@ -159,7 +159,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Region",
+						name: "Region".padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${member.region}\`\``,
 						inline: true
 					}
@@ -170,7 +170,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "ID",
+						name: "ID".padEnd(20, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${member.id}\`\``,
 						inline: true
 					}
