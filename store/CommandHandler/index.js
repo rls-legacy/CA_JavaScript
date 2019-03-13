@@ -73,15 +73,19 @@ exports.run = (client, object, commandDoc, database) => {
 									for (let b = 0; b < obj[i][x]['aliases'].length; b++) {
 										if (obj[i][x]['aliases'][b].startsWith(arr[0]) && (!arr_g[c] || c_temp === arr_g[c++])) {
 											if (typeof obj[i][0] === 'object') {
+
 												arr[0] = obj[i][0]['aliases'][0];
 												c_temp = obj[i][0]['aliases'][0];
 												arr_g.push(obj[i][0]['aliases'][0]);
 												arr_go[c - 1] = obj[i][x]['aliases'][0];
+
 											} else {
+
 												arr[0] = obj[i][0];
 												c_temp = obj[i][0];
-												arr_g.push(obj[i][0])
+												arr_g.push(obj[i][0]);
 												arr_go[c] = obj[i][x]['aliases'][0];
+
 											}
 										}
 									}
@@ -89,13 +93,12 @@ exports.run = (client, object, commandDoc, database) => {
 									if (obj[i][x].startsWith(arr[0]) && (!arr_g[c] || c_temp === arr_g[c++])) {
 										arr[0] = obj[i][0];
 										c_temp = obj[i][0];
-										arr_g.push(obj[i][0])
+										arr_g.push(obj[i][0]);
 									}
 								}
 							}
 						}
 						extractJSON(obj[i]);
-
 					}
 				}
 			}

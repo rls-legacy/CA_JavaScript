@@ -29,16 +29,20 @@ exports.run = (client, object, intent) => {
 
 	switch (intent) {
 		//Export: to database.js
-			/*
+		/*
 		case "guildCreate":
 			RunCommandFile(`./../database/index.js`, client, object, {'folder': 'upload', 'main': 'create', 'sub_intent': intent});
 			break;
+		/*
 		case "guildDelete":
 			RunCommandFile(`./../database/index.js`, client, object, {'folder': 'upload', 'main': 'delete', 'sub_intent': intent});
 			break;
-			*/
+		*/
 		case "message":
 			RunCommandFile(`./../store/index.js`, client, object, {'folder': 'CommandHandler', 'file': 'index', 'sub_intent': intent}, database);
+			break;
+		case "bot-message":
+			RunCommandFile(`./../store/index.js`, client, object, {'folder': 'MessageHandler', 'file': 'index', 'sub_intent': intent}, database);
 			break;
 		default:
 			break;

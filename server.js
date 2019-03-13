@@ -58,6 +58,9 @@ client.on("message", message => {
 
 	if (message.content.startsWith("captn ping")) {
 		RunCommandFile('./store/modules/system/ping.js', message)
+	} else if (message.author.bot){
+		//Export: to @/router/index.js
+		RunCommandFile('./router/index.js', message, "bot-message")
 	} else {
 		//Export: to @/router/index.js
 		RunCommandFile('./router/index.js', message, "message")

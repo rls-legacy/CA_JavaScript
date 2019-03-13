@@ -14,16 +14,38 @@ function RunCommandFile(file, client, object, embed, edit, override) {
 	commandFile.run(client, object, embed, edit, override);
 }
 
+/*Local Functions*/
+//Get Commands
+function GetUsers(path) {
+	return new Promise(function(resolve, reject) {
+		//Firebase: Get Command Document
+		try {
+			let getUsers = path.get()
+				.then(doc => {
+					if (doc.exists) {
+						resolve(doc.data())
+					} else {
+						reject()
+					}
+				});
+		} catch (e) {
+			console.log(e)
+			resolve(0)
+		}
+
+	});
+}
+
 exports.description = () => {
 	return {
 		name: "info",
 		description: "Returns current speed of the RLS-Legacy",
-		permissions: ["SEND_MESSAGES", "ADMINISTRATOR"]
+		permissions: ["SEND_MESSAGES"]
 	}
 };
 
 //Export: from @/store/CommandHandler/index.js
-exports.run = async (client, object, base, override) => {
+exports.run = async (client, object, base, override, database) => {
 
 	let array = [];
 
@@ -75,7 +97,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Status".padEnd(20, `~`).replace(/~/g, "⠀"),
+						name: "Status".padEnd(23, `~`).replace(/~/g, "⠀"),
 						value: status_icon + `\`\`${status_i}\`\``,
 						inline: true
 					}
@@ -102,6 +124,9 @@ exports.run = async (client, object, base, override) => {
 					sub_status = member.user.presence.game.state;
 					if (member.user.presence.game.name) {
 						main_status = member.user.presence.game.name;
+						if (member.user.presence.game.name === "Spotify") {
+							sub_status = sub_status + " - " + member.user.presence.game.details
+						}
 					}
 				} else {
 					if (member.user.presence.game.name) {
@@ -110,10 +135,26 @@ exports.run = async (client, object, base, override) => {
 				}
 			}
 
+			let imURL = member.user.avatarURL;
+			if (base['command'] === "presence") {
+				if (member.user.presence.game) {
+					if (member.user.presence.game.assets) {
+						if (member.user.presence.game.assets.largeImageURL) {
+							imURL = member.user.presence.game.assets.largeImageURL
+						} else if (member.user.presence.game.assets.smallImageURL) {
+							imURL = member.user.presence.game.assets.smallImageURL
+						}
+					}
+				}
+			}
+
 			return {
+				thumbnail: {
+					url: imURL
+				},
 				fields: [
 					{
-						name: main_status.padEnd(22, `~`).replace(/~/g, "⠀"),
+						name: main_status.toString().padEnd(24, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${sub_status}\`\``,
 						inline: true
 					},
@@ -130,7 +171,7 @@ exports.run = async (client, object, base, override) => {
 			return {
 				fields: [
 					{
-						name: "Nickname".padEnd(20, `~`).replace(/~/g, "⠀"),
+						name: "Nickname".padEnd(23, `~`).replace(/~/g, "⠀"),
 						value: `\`\`${main_nickname}\`\``,
 						inline: true
 					}
@@ -197,17 +238,45 @@ exports.run = async (client, object, base, override) => {
 				]
 			}
 		},
-		info: function (member) {
+		points: async function(member) {
+
+			try {
+				let m_points = await GetUsers(database.collection('users').doc(member.id));
+				let m_guild = await GetUsers(database.collection('guilds').doc(member.guild.id));
+
+				return await {
+					fields: [
+						{
+							name: `Points`.padEnd(23, `~`).replace(/~/g, "⠀"),
+							value: `\`\`${m_points['catcher'][m_guild["Configuration"]["Points"]["bot_id"]]["guilds"][object.guild.id]['messages']}\`\``,
+							inline: true
+						}
+					]
+				}
+
+			} catch (e) {
+				return {
+					fields: [
+						{
+							name: `Points`.padEnd(23, `~`).replace(/~/g, "⠀"),
+							value: `\`\`No points set.\`\``,
+							inline: true
+						}
+					]
+				}
+			}
+		},
+		info: async function (member) {
 			let override_embed = {
 				description: `\`\`Created: ${moment(member.user.createdTimestamp).fromNow()}\`\`\n\`\`Joined: ${moment(member.joinedTimestamp).fromNow()}\`\``,
 				timestamp: null
 			};
 
 			let embed_arr = [
-				this.status(member), this.nickname(member), this.presence(member), this.id(member), this.roles(member), override_embed
+				this.nickname(member), this.presence(member), this.status(member), await this.points(member), this.roles(member), override_embed
 			];
 
-			return merge.all(embed_arr)
+			return await merge.all(embed_arr)
 		}
 	};
 
@@ -235,7 +304,21 @@ exports.run = async (client, object, base, override) => {
 
 	if (array.length === 0) {
 		let user = object.author;
-		let v = new Vibrant(user.avatarURL);
+
+		let imURL = user.avatarURL;
+		if (base['command'] === "presence") {
+			if (user.presence.game) {
+				if (user.presence.game.assets) {
+					if (user.presence.game.assets.largeImageURL) {
+						imURL = user.presence.game.assets.largeImageURL
+					} else if (user.presence.game.assets.smallImageURL) {
+						imURL = user.presence.game.assets.smallImageURL
+					}
+				}
+			}
+		}
+
+		let v = new Vibrant(imURL);
 		v.getPalette().then((palette) => {
 			let member = object.guild.members.get(user.id);
 			let base_embed = embedder(member, array, palette);
@@ -251,8 +334,11 @@ exports.run = async (client, object, base, override) => {
 				func_name = "info";
 			}
 
-			let embed = merge(base_embed, profile[func_name](member, array, palette));
-			RunCommandFile("./../../CommandHandler/output/embed.js", client, object, embed, false, override)
+			async function test() {
+				let embed = await merge(base_embed, await profile[func_name](member, array, palette));
+				await RunCommandFile("./../../CommandHandler/output/embed.js", client, object, embed, false, override)
+			}
+			test()
 		});
 	}
 
@@ -268,19 +354,35 @@ exports.run = async (client, object, base, override) => {
 			} else if (object.guild.members.find(value => value.displayName.toLowerCase().startsWith(array[x]))) {
 				array[x] = array[x].toLowerCase();
 				user = object.guild.members.find(value => value.displayName.toLowerCase().startsWith(array[x])).user
-			} else if (object.guild.members.find(value => value.id.startsWith(array[x]))) {
-				user = object.guild.members.find(value => value.id.startsWith(array[x])).user
+			} else if (object.guild.members.find(value => value.id.toString().startsWith(array[x].toString().trim()))) {
+				user = object.guild.members.find(value => value.id.toString().startsWith(array[x].toString().trim())).user
 			} else if (client.users.find(value => value.username.toLowerCase().startsWith(array[x]))) {
 				array[x] = array[x].toLowerCase();
 				user = client.users.find(value => value.username.toLowerCase().startsWith(array[x]))
 			} else if (object.mentions.members.array()[b]) {
 				user = object.mentions.users.array()[b];
 				b++
+			} else {
+
 			}
 		}
 
+
 		if (user !== null) {
-			let v = new Vibrant(user.avatarURL);
+			let imURL = user.avatarURL;
+			if (base['command'] === "presence") {
+				if (user.presence.game) {
+					if (user.presence.game.assets) {
+						if (user.presence.game.assets.largeImageURL) {
+							imURL = user.presence.game.assets.largeImageURL
+						} else if (user.presence.game.assets.smallImageURL) {
+							imURL = user.presence.game.assets.smallImageURL
+						}
+					}
+				}
+			}
+
+			let v = new Vibrant(imURL);
 			v.getPalette().then((palette) => {
 				let member = object.guild.members.get(user.id);
 				let base_embed = embedder(member, array, palette);
@@ -296,8 +398,11 @@ exports.run = async (client, object, base, override) => {
 					func_name = "info";
 				}
 
-				let embed = merge(base_embed, profile[func_name](member, array, palette));
-				RunCommandFile("./../../CommandHandler/output/embed.js", client, object, embed, false, override)
+				async function test() {
+					let embed = await merge(base_embed, await profile[func_name](member, array, palette));
+					await RunCommandFile("./../../CommandHandler/output/embed.js", client, object, embed, false, override)
+				}
+				test()
 			});
 		} else {
 
