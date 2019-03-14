@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "blueimp-md5": "^2.10.0",
+    "cheerio": "^1.0.0-rc.2",
     "deepmerge": "^3.2.0",
     "dirty-json": "^0.7.0",
     "discord.js": "^11.4.2",
@@ -14,7 +15,9 @@
     "moment": "^2.24.0",
     "node-vibrant": "^3.2.0-alpha",
     "patriarchy": "^1.0.8",
+    "request": "latest",
     "rgb-to-int": "^1.0.0",
+    "turndown": "^5.0.3",
     "wtf_wikipedia": "^7.2.10"
   },
   "devDependencies": {

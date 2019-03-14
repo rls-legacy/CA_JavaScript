@@ -9,7 +9,7 @@ exports.return = (object) => {
 		joiner = " "
 	}
 
-	let arr = object.content.toLowerCase().split(joiner);
+	let arr = object.content.split(joiner);
 
 	return {arr, joiner};
 };

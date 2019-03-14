@@ -50,7 +50,7 @@ exports.run = async (client, object, database) => {
 						break;
 				}
 				// noinspection JSUnfilteredForInLoop
-				if(object['embeds'][0][x['search_in']['search_for']].startsWith(x['search_in']['search_arg'][1])) {
+				if(object['embeds'][0][x['search_in']['search_for']] && object['embeds'][0][x['search_in']['search_for']].startsWith(x['search_in']['search_arg'][1])) {
 					// noinspection JSUnfilteredForInLoop
 					switch (x['search_us']['search_arg'][0]) {
 						case "StartsWith":

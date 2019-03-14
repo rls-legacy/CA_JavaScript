@@ -23,8 +23,8 @@ exports.run = async (client, object, array, override) => {
 	object.channel.fetchMessages()
 		.then(messages => {
 
-				object.channel.bulkDelete(messages.filter(m => m.author.id === '543452329387753502')).then(() => {
-					object.channel.send(`Deleted ${messages.filter(m => m.author.id === '543452329387753502').size} messages.`).then(msg => msg.delete(3000));
+				object.channel.bulkDelete(messages.filter(m => m.author.id === '256223699277971456')).then(() => {
+					object.channel.send(`Deleted ${messages.filter(m => m.author.id === '256223699277971456').size} messages.`).then(msg => msg.delete(3000));
 				});
 			}
 		)

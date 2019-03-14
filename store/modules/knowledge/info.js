@@ -29,11 +29,11 @@ exports.run = async (client, object, base, override) => {
 
 	let query_arr = [];
 
-	if (base['mapper']) {
-		query_arr = base['mapper']['default'];
+	if (base['case_mapper']) {
+		query_arr = base['case_mapper']['fullCase'];
 
 		if (query_arr === undefined) {
-			query_arr = base['mapper']['argument'];
+			query_arr = base['case_mapper']['argument'];
 			if (query_arr === undefined) {
 				query_arr = ["Alice in Wonderland"]
 			} else if (!Array.isArray(query_arr)) {
