@@ -30,7 +30,7 @@ exports.run = async (client, object, base, override) => {
 	let query_arr = [];
 
 	if (base['case_mapper']) {
-		query_arr = base['case_mapper']['fullCase'];
+		query_arr = base['case_mapper']['default'];
 
 		if (query_arr === undefined) {
 			query_arr = base['case_mapper']['argument'];
@@ -135,7 +135,7 @@ exports.run = async (client, object, base, override) => {
 						let spaceNearMiddle = fl_name.lastIndexOf(' ', middle);
 						let string1 = cutStr(fl_name.substring(0, spaceNearMiddle), false)/*.padEnd(30, `~`).replace(/~/g, "⠀")*/;
 						let string2 = cutStr(fl_name.substring(spaceNearMiddle + 1, length), false)/*.padEnd(30, `~`).replace(/~/g, "⠀")*/;
-						return flx_name = string1 + "\n".padEnd(n.toString().length, `~`).replace(/~/g,"⠀") + "⠀ ⠀" + string2;
+						return flx_name = string1 + "\n".padEnd(n.toString().length, `~`).replace(/~/g, "⠀") + "⠀ ⠀" + string2;
 					} else {
 						if (sub === true) {
 							g++;

@@ -19,5 +19,9 @@ exports.description = () => {
 
 //Export: from @/store/CommandHandler/index.js
 exports.run = async (client, object, array, override) => {
-	object.channel.send("I'm Broken :heart:")
+
+
+		object.channel.send("I'm Broken :heart:")
+	
+
 };

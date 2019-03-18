@@ -34,7 +34,7 @@ exports.run = async (client, object, base, override, database) => {
 	let urlstring = "";
 
 	if (base['case_mapper']) {
-		urladder = base['case_mapper']['fullCase'];
+		urladder = base['case_mapper']['default'];
 
 		if (urladder === undefined) {
 			urladder = base['case_mapper']['argument'];

@@ -48,9 +48,13 @@ exports.description = () => {
 exports.run = async (client, object, base, override, database) => {
 
 	let array = [];
+	let array2 = [];
 
 	if (base['mapper']) {
 		array = base['mapper']['default'];
+		if (base['mapper']['wildcard'][0]) {
+			array2 = base['mapper']['wildcard'][0];
+		}
 
 		if (array === undefined) {
 			array = base['mapper']['users'];
@@ -347,7 +351,32 @@ exports.run = async (client, object, base, override, database) => {
 	for (let x = 0; x <= Math.min(array.length, 3); x++) {
 		let user = null;
 
-		if (array[x]) {
+		if (array2.length > 1) {
+			console.log(array2[0] + "" + array2[2]);
+			if (user === null) {
+				user = object.guild.members.find(value => {
+					if (value.displayName.toLowerCase().startsWith(array2[0]) && value.displayName.toLowerCase().endsWith(array2[2])) {
+						return value
+					}
+				});
+
+				if (user) {
+					user = user.user
+				}
+			}
+			if (user === null) {
+				user = client.users.find(value => {
+					if (value.username.toLowerCase().startsWith(array2[0]) && value.username.toLowerCase().endsWith(array2[2])) {
+						return value
+					}
+				});
+
+				if (user) {
+				}
+			}
+
+			array2 = []
+		} else if (array[x]) {
 			if (object.guild.members.get(array[x])) {
 				array[x] = array[x].toLowerCase();
 				user = object.guild.members.get(array[x]).user;

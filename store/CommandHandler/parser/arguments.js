@@ -1,12 +1,25 @@
 const dJSON = require("dirty-json");
+
+
+/*Local Functions*/
+function optionParser(input) {
+	input['wildcard'] = [];
+	for (let x = 0; x < input['default'].length; x++) {
+		let wildcard = input['default'][0].split(/(\*)/g);
+		input['wildcard'].push(wildcard)
+	}
+	console.log(input)
+}
+
+
+
 //Export: from @/store/CommandHandler/index.js
 exports.return = (object, joiner) => {
 	let command = object[0];
 	let string = object.splice(1).join(joiner).trim();
 
-	let caseSt;
-
 	let f_string;
+
 	if (string.includes(":")) {
 		string = string.replace(/([a-zA-Z0-9-]+)[\s]+:[\s]+([a-zA-Z0-9-]+)/g, "\"$1: $2").replace(/'+(?=([^"]*"[^"]*")*[^"]*$)/g, "\"");
 
@@ -69,8 +82,7 @@ exports.return = (object, joiner) => {
 			console.log(subobj[x])
 		}
 
-		string = subobj.join(",")
-
+		f_string = subobj.join(",")
 
 	} else {
 		string = string.replace(/\s+(?=([^"]*"[^"]*")*[^"]*$)/g, ',');
@@ -84,7 +96,6 @@ exports.return = (object, joiner) => {
 		}
 
 		f_string = "default:" + string;
-		caseSt = "fullCase:" + string;
 	}
 
 	if (!f_string.startsWith("{")) {
@@ -95,17 +106,11 @@ exports.return = (object, joiner) => {
 		f_string = f_string + "}"
 	}
 
-	if (!caseSt.startsWith("{")) {
-		caseSt = "{" + caseSt
-	}
-
-	if (!caseSt.endsWith("}")) {
-		caseSt = caseSt + "}"
-	}
-
+	let case_mapper = dJSON.parse(f_string);
 	let mapper = dJSON.parse(f_string.toLowerCase());
-	let case_mapper = dJSON.parse(caseSt);
 
+	optionParser(mapper);
+	optionParser(case_mapper);
 	return { mapper, case_mapper, command };
 
 };

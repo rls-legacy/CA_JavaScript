@@ -17,6 +17,7 @@
     "patriarchy": "^1.0.8",
     "request": "latest",
     "rgb-to-int": "^1.0.0",
+    "stackexchange": "^1.1.0",
     "turndown": "^5.0.3",
     "wtf_wikipedia": "^7.2.10"
   },
