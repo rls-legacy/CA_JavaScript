@@ -1,6 +1,8 @@
 /*Global Variables*/
+const Discord = require('discord.js');
 const zlib = require('zlib');
 const http = require("http");
+const scraper = require('google-search-scraper');
 const TurndownService = require('turndown');
 const Vibrant = require('node-vibrant');
 const rgb = require('rgb-to-int');
@@ -48,9 +50,51 @@ exports.run = async (client, object, base, override, database) => {
 	if (urladder[0]) {
 		urladder = urladder.join(" ");
 	}
-	console.log(urlstring);
 
-	let website = `http://api.stackexchange.com/2.2/search/advanced?order=desc&answers=1&sort=activity&title=${urladder}&site=stackoverflow&key=${process.env.STACKEXCHANGE}`;
+
+	let options = {
+		query: `site:stackoverflow.com "${urladder}"`,
+		limit: 2
+	};
+
+	let g_results = [];
+	let g_results2 = [];
+	let count = 0;
+
+	function g_searching () {
+		return new Promise( function (resolve) {
+			scraper.search(options, function(err, url, meta) {
+				// This is called for each result
+				count++;
+				if(err) throw err;
+				let suburl = 34788047;
+				if (url) {
+					if (url.split("/")[4]) {
+						suburl = url.split("/")[4];
+					}
+				}
+				g_results.push({
+					name: count + ") " + meta.title,
+					value: meta.desc,
+				});
+				g_results2.push({
+					name: meta.title,
+					value: meta.desc,
+					url: suburl
+				});
+				resolve(g_results)
+			});
+		})
+	}
+
+	async function runner() {
+		let tent = await g_searching();
+		if (tent.length !== 0) {
+			await test(tent)
+		}
+	}
+
+	runner();
 
 	function getGzipped(url, callback) {
 		// buffer to store the streamed decompression
@@ -77,67 +121,7 @@ exports.run = async (client, object, base, override, database) => {
 		});
 	}
 
-	getGzipped(website, function(err, data) {
-		//console.log(JSON.parse(data));
-		let fullJSON = JSON.parse(data);
-
-		let field_val = [];
-		let subfield = [];
-		let c = 0;
-		field_val[c] = [];
-		let longest = [];
-		longest[c] = 0;
-		let g = 0;
-
-		for (let n = 0; n < fullJSON['items'].length; n++) {
-
-			if (fullJSON['items'][n]) {
-				fl_name = fullJSON['items'][n]['title'];
-
-				function cutStr(fl_name, sub) {
-
-					if (fl_name.length > 70) {
-						if (sub === true) {
-							g = g + 2;
-						} else {
-							g++;
-						}
-						let length = fl_name.length + n.toString().length + 2;
-						let middle = 70;
-						let spaceNearMiddle = fl_name.lastIndexOf(' ', middle);
-						let string1 = cutStr(fl_name.substring(0, spaceNearMiddle), false)/*.padEnd(30, `~`).replace(/~/g, "⠀")*/;
-						let string2 = cutStr(fl_name.substring(spaceNearMiddle + 1, length), false)/*.padEnd(30, `~`).replace(/~/g, "⠀")*/;
-						return flx_name = string1 + "\n".padEnd(n.toString().length, `~`).replace(/~/g,"⠀") + "⠀ ⠀" + string2;
-					} else {
-						if (sub === true) {
-							g++;
-						}
-						return "⠀" + fl_name
-					}
-				}
-
-				fl_name = cutStr(fl_name, true);
-
-				if (fl_name.length > longest[c]) {
-					longest[c] = fl_name
-				}
-
-				//console.log(fl_name);
-				field_val[c].push(`${n + 1}. ${fl_name/*.padEnd(30, `~`).replace(/~/g, "⠀")*/}`);
-				if ((g % 10 === 0) || (g % 11 === 0)) {
-					g = 0;
-					c++;
-					field_val[c] = [];
-					longest[c] = [];
-				}
-			}
-
-		}
-
-		while (c !== -1) {
-			subfield.push({name: ("List " + (c+1)).padEnd(25, `~`).replace(/~/g, "⠀"),value: `\`\`${field_val[c].join("\n")}\`\``, inline: true})
-			c--
-		}
+	function test(g_results) {
 
 		let imageURL = "https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png";
 		let v = new Vibrant(imageURL);
@@ -151,14 +135,13 @@ exports.run = async (client, object, base, override, database) => {
 
 			let embed = {
 				author: {
-					name: `${fullJSON['items'][0]['title']}`,
-					url: fullJSON['items'][0]['link'],
+					name: `Results for ${urladder}`,
 					icon_url: imageURL
 				},
 				title: null,
 				color: rgb(rgb_product),
 				//description: fullJSON['items'][0]['body'],
-				fields: subfield.reverse(),
+				fields: g_results,
 				footer: {
 					icon_url: null,
 					text: "StackOverflow Question"
@@ -167,6 +150,72 @@ exports.run = async (client, object, base, override, database) => {
 
 			RunCommandFile("./../../../CommandHandler/output/embed.js", client, object, embed, false, override)
 		});
-	});
+
+
+		const collector = new Discord.MessageCollector(object.channel, m => m.author.id === object.author.id, {time: 10000});
+		let n = 10;
+		collector.on('collect', message => {
+			if (!/\d*/.test(message.content)) {
+				message.channel.send("Please input a number.")
+			} else if (message.content.match(/\d*/g)[0] > n) {
+				message.channel.send("Your number is too high.")
+			} else if (message.content.match(/\d*/g)[0] > n) {
+				message.channel.send("Your number is too low.")
+			} else {
+				collector.stop();
+				n = message.content.match(/\d*/g)[0] - 1;
+
+				let website = `http://api.stackexchange.com/2.2/questions/${g_results2[n]['url']}?order=desc&sort=activity&site=stackoverflow&filter=!-y(KwOdKR5Ga7mmruVArx2SJykc-M)3jKiDQBk1fq&key=${process.env.STACKEXCHANGE}`;
+
+				getGzipped(website, function(err, data) {
+
+					let fullJSON = JSON.parse(data);
+
+					let turndownService = new TurndownService({
+						headingStyle: "atx",
+						bulletListMarker: "+",
+						codeBlockStyle: "fenced",
+					});
+					turndownService.remove('style');
+					let fullmd = turndownService.turndown(fullJSON['items'][0]['answers'][0]['body']).trim();
+
+					let imageURL = "https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png";
+					let v = new Vibrant(imageURL);
+					v.getPalette().then((palette) => {
+
+						let rgb_product = {
+							red: palette['Vibrant']['rgb'][0],
+							green: palette['Vibrant']['rgb'][1],
+							blue: palette['Vibrant']['rgb'][2]
+						};
+
+						let embed = {
+							author: {
+								name: `${fullJSON['items'][0]['title']}`,
+								url: fullJSON['items'][0]['link'],
+								icon_url: imageURL
+							},
+							title: null,
+							color: rgb(rgb_product),
+							//description: fullJSON['items'][0]['body'],
+							fields: [
+								{
+									name: fullJSON['items'][0]['title'],
+									value: fullmd
+								}
+							],
+							footer: {
+								icon_url: null,
+								text: "StackOverflow Question"
+							}
+						};
+
+						RunCommandFile("./../../../CommandHandler/output/embed.js", client, object, embed, false, override)
+					});
+				});
+			}
+		});
+	}
+
 
 };
